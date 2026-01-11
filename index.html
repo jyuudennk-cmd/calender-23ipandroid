@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>予定登録</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<script>
+  // ===== 1. 今日の日付 =====
+  const today = new Date();
+
+  // ===== 2. 23ヶ月後の月初 =====
+  const target = new Date(
+    today.getFullYear(),
+    today.getMonth() + 23,
+    1
+  );
+
+  const y = target.getFullYear();
+  const m = String(target.getMonth() + 1).padStart(2, '0');
+  const d = '01';
+
+  // 終日イベント（翌日を終了日に）
+  const startDate = `${y}${m}${d}`;
+
+  const nextDay = new Date(target);
+  nextDay.setDate(nextDay.getDate() + 1);
+
+  const endDate =
+    `${nextDay.getFullYear()}` +
+    `${String(nextDay.getMonth() + 1).padStart(2, '0')}` +
+    `${String(nextDay.getDate()).padStart(2, '0')}`;
+
+  // ===== 3. iPhone判定 =====
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+
+  if (isIOS) {
+    // ===== 4. iOS用 ICS生成 =====
+    const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//QR Calendar//JP
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:${startDate}
+DTEND;VALUE=DATE:${endDate}
+SUMMARY:【イオンモバイル】docomoスマホカエドキプログラム23か月目のご連絡
+DESCRIPTION:現在、ご購入より23か月目です。スマホカエドキプログラムのご利用をご検討の際はイオンモバイルへご相談ください。
+END:VEVENT
+END:VCALENDAR`;
+
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+
+    location.href = url;
+
+  } else {
+    // ===== 5. Googleカレンダー =====
+    const calendarUrl =
+      "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+      "&text=【イオンモバイル】docomoスマホカエドキプログラム23か月目のご連絡" +
+      `&dates=${startDate}/${endDate}` +
+      "&details=現在、ご購入より23か月目です。スマホカエドキプログラムのご利用をご検討の際はイオンモバイルへご相談ください。";
+
+    location.href = calendarUrl;
+  }
+</script>
+
+<p>カレンダー登録画面を開いています…</p>
+</body>
+</html>
