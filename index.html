@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-  
 <head>
   <meta charset="UTF-8">
   <title>予定登録</title>
@@ -17,6 +16,9 @@
 </head>
 
 <body>
+
+<p>カレンダー登録画面を開いています…</p>
+
 <script>
   // ===== 1. 今日の日付 =====
   const today = new Date();
@@ -32,9 +34,9 @@
   const m = String(target.getMonth() + 1).padStart(2, '0');
   const d = '01';
 
-  // 終日イベント（翌日を終了日に）
   const startDate = `${y}${m}${d}`;
 
+  // 終日イベント（翌日を終了日に）
   const nextDay = new Date(target);
   nextDay.setDate(nextDay.getDate() + 1);
 
@@ -43,12 +45,18 @@
     `${String(nextDay.getMonth() + 1).padStart(2, '0')}` +
     `${String(nextDay.getDate()).padStart(2, '0')}`;
 
-  // ===== 3. iPhone判定 =====
+  // ===== 3. iOS判定 =====
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
-  if (isIOS) {
-    // ===== 4. iOS用 ICS生成 =====
-    const ics =
+  // ★ GA4に明示的に page_view を送信
+  gtag('event', 'page_view');
+
+  // ★ 500ms待ってからリダイレクト
+  setTimeout(() => {
+
+    if (isIOS) {
+      // ===== 4. iOS用 ICS生成 =====
+      const ics =
 `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//QR Calendar//JP
@@ -56,31 +64,27 @@ BEGIN:VEVENT
 DTSTART;VALUE=DATE:${startDate}
 DTEND;VALUE=DATE:${endDate}
 SUMMARY:【イオンモバイル】docomoスマホカエドキプログラム23か月目のご連絡
-DESCRIPTION:現在、ご購入より23か月目です。来月より再分割のご請求が始まります。スマホカエドキプログラムのご利用をご検討の際はお早めにイオンモバイルへご相談ください。お近くのイオンモバイルはこちらhttps://aeonmobile.jp/shoplist/
+DESCRIPTION:現在、ご購入より23か月目です。来月より再分割のご請求が始まります。スマホカエドキプログラムのご利用をご検討の際はお早めにイオンモバイルへご相談ください。お近くのイオンモバイルはこちら https://aeonmobile.jp/shoplist/
 END:VEVENT
 END:VCALENDAR`;
 
-    const blob = new Blob([ics], { type: 'text/calendar' });
-    const url = URL.createObjectURL(blob);
+      const blob = new Blob([ics], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      location.href = url;
 
-    location.href = url;
+    } else {
+      // ===== 5. Googleカレンダー =====
+      const calendarUrl =
+        "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+        "&text=【イオンモバイル】docomoスマホカエドキプログラム23か月目のご連絡" +
+        `&dates=${startDate}/${endDate}` +
+        "&details=現在、ご購入より23か月目です。来月より再分割のご請求が始まります。スマホカエドキプログラムのご利用をご検討の際はお早めにイオンモバイルへご相談ください。お近くのイオンモバイルはこちら https://aeonmobile.jp/shoplist/";
 
-  } else {
-    // ===== 5. Googleカレンダー =====
-    const calendarUrl =
-      "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-      "&text=【イオンモバイル】docomoスマホカエドキプログラム23か月目のご連絡" +
-      `&dates=${startDate}/${endDate}` +
-      "&details=現在、ご購入より23か月目です。来月より再分割のご請求が始まります。スマホカエドキプログラムのご利用をご検討の際はお早めにイオンモバイルへご相談ください。お近くのイオンモバイルはこちらhttps://aeonmobile.jp/shoplist/";
+      location.href = calendarUrl;
+    }
 
-    location.href = calendarUrl;
-  }
+  }, 500); // ← GA計測安定用ディレイ
 </script>
 
-<p>カレンダー登録画面を開いています…</p>
 </body>
-
 </html>
-
-
-
